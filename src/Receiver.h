@@ -6,5 +6,5 @@ void AsyncPacket(String message)
 {
   LoRa.beginPacket();
   LoRa.print(message);
-  LoRa.endPacket(true);
+  LoRa.endPacket();
 }

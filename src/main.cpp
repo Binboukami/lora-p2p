@@ -31,6 +31,7 @@
 #define MAX_BUFF_SIZE 255
 char lora_buff[MAX_BUFF_SIZE];
 
+int counter = 0;
 int _sendInterval = 2000;
 long _lastSendTime = 0;
 
@@ -41,7 +42,6 @@ bool InitLora();
 void setup() {
 
   Serial.begin(115200);
-  while(!Serial);
 
   while(!InitLora());
 
@@ -69,14 +69,16 @@ void loop() {
 
   if((millis() - _lastSendTime) > _sendInterval)
   {
-    // TODO: Define message
-    // Define async message to be execute every interval
     String message = "Hello, world\n";
-    AsyncPacket(message);
-    _lastSendTime = millis();
-  }
+    LoRa.beginPacket();
+    LoRa.print(message);
+    LoRa.print(counter);
+    LoRa.endPacket();
 
-  // 
+    Serial.println("Enviando: " + message);
+    _lastSendTime = millis();
+    counter++;
+  }
 }
 
 /* TODO: TASKS
@@ -95,7 +97,9 @@ void onTxDone() {
   Serial.println("TxDone");
 }
 
-// TODO: Testar trocar os pinos usados pelo LoRa
+/*
+  @see https://www.makerhero.com/blog/comunicacao-lora-ponto-a-ponto-com-modulos-esp32-lora/?srsltid=AfmBOoo_C4YglJ10PAFk1F2ZvdahiF3xK2puvPehi5sTjggVRLYJVrqq
+*/
 bool InitLora() {
 
   bool hasInit = false;
