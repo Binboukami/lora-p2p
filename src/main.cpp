@@ -2,22 +2,22 @@
 #include "config.h"
 
 #if OS_MODE == SENDER
-  #include "sender.h"
+  #include "client.h"
 #else
-  #include "receiver.h"
+  #include "broker.h"
 #endif
 
 #ifdef HAS_DISPLAY
   HAS_DISPLAY display(OLED_RST, OLED_SCL, OLED_SDA);
 #endif
 
-/*
-  TODO:
-    - Transmissor LoRa
-        - Transmitir as letras do alfabeto a cada 2 segundos
-    - Receptor LoRa
-        - Receber e mostrar no display o que recebeu
+#define SCK_LORA           5
+#define MISO_LORA          19
+#define MOSI_LORA          27
+#define RESET_PIN_LORA     14
+#define SS_PIN_LORA        18
 
+/*
   TODO: TASKS
   - DEFAULT_TASK (Trasnmit byte sized data and listen for possible queries)
   - QUERY_TASK (Parses query request and schedules task for trasnmission)
@@ -28,12 +28,13 @@
 
 
 int counter = 0;
-int _sendInterval = 2000;
 long _lastSendTime = 0;
 
 void setup() {
 
-  Serial.begin(115200);
+  /* Init Serial0 (also known as UART0 on client) by default since its used
+  in both client and broker communication and be used for logging on startup */
+  Serial.begin(9600);
 
   while(!initLoRa());
 
@@ -44,15 +45,6 @@ void setup() {
   _setup();
 }
 
-/*
-  TODO:
-    - Enable querying data from devices connected to the board so only the coordinates need
-    to be streamed constantly
-      - TODO: Use endPacket with non blocking mode for coordinates transmition
-    - Constantly check if queries were received, and if so, proceed to decoding task and
-    scheduling for data queried transmission
-      - After the data queried has been transmitted, return to default scheduled task
-*/
 void loop()
 {
   _loop();

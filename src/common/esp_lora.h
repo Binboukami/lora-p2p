@@ -2,6 +2,9 @@
 
 #include <LoRa.h>
 #include "config.h"
+#include "common/packet.h"
+
+extern long _lastSendTime;
 
 void _setup();
 void _loop();
@@ -31,4 +34,14 @@ bool initLoRa()
   }
 
   return _initialized; 
+}
+
+bool onInterval(long default_interval = 10000)
+{
+  bool pass = (millis() - _lastSendTime) > default_interval;
+
+  if(pass)
+    _lastSendTime = millis();
+
+  return pass;
 }
