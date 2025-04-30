@@ -7,13 +7,14 @@
   #include "display.h"
 #endif
 
-
 Packet out_p;
 Packet pacote;
 
 void _setup() {
 
-  Serial.begin(115200);
+  #ifdef DEBUG_SERIAL
+    UART0.begin(115200);
+  #endif
 
   LoRa.onTxDone(onTxDone);
   LoRa.onReceive(onReceive);
@@ -48,25 +49,22 @@ void _loop() {
 }
 
 void onTxDone() {
-
-  Serial.printf("Enviando opcode: %x\n", out_p.op_code);
-
+  #ifdef DEBUG_SERIAL
+    UART0.printf("Enviando opcode: %x\n", out_p.op_code);
+  #endif
 }
 
 void onReceive(int packetSize) {
-  // received a packet
-  Serial.print("Received packet '");
-  // memset(&pacote, 0x0, sizeof(pacote));
-
-  // read packet
   LoRa.readBytes((uint8_t*)&pacote, sizeof(pacote));
 
-  Serial.println("RECEBIDO: ");
+  #ifdef DEBUG_SERIAL
+    UART0.println("RECEBIDO: ");
 
-  Serial.printf("OP_CODE: %u \n", pacote.op_code);
-  Serial.printf("PAYLOAD: %s \n", pacote.payload);
+    UART0.printf("OP_CODE: %u \n", pacote.op_code);
+    UART0.printf("PAYLOAD: %s \n", pacote.payload);
 
-  // print RSSI of packet
-  Serial.print("' with RSSI ");
-  Serial.println(LoRa.packetRssi());
+    // print RSSI of packet
+    UART0.print("' with RSSI ");
+    UART0.println(LoRa.packetRssi());
+  #endif
 };

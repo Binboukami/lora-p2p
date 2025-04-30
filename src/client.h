@@ -9,9 +9,10 @@ extern int counter;
 Packet in_packet;
 Packet out_packet;
 
-#define UART0 Serial
-
 void _setup() {
+
+  UART0.begin(9600);
+
   // Callback function for when a packet transmission finish.
   LoRa.onTxDone(onTxDone);
 

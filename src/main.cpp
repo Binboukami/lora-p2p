@@ -7,7 +7,7 @@
   #include "broker.h"
 #endif
 
-#ifdef HAS_DISPLAY
+#ifdef USE_DISPLAY
   HAS_DISPLAY display(OLED_RST, OLED_SCL, OLED_SDA);
 #endif
 
@@ -31,10 +31,6 @@ int counter = 0;
 long _lastSendTime = 0;
 
 void setup() {
-
-  /* Init Serial0 (also known as UART0 on client) by default since its used
-  in both client and broker communication and be used for logging on startup */
-  Serial.begin(9600);
 
   while(!initLoRa());
 
