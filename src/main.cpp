@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include "config.h"
 
-#if OS_MODE == SENDER
+#if OS_MODE == CLIENT
   #include "client.h"
 #else
   #include "broker.h"

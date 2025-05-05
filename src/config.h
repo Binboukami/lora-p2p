@@ -10,8 +10,8 @@
 /* OS MODES 
   Uses build flags to keep all the source code in the same project
 */
-#define SENDER 0x00
-#define RECEIVER 0x01
+#define CLIENT 0x00
+#define BROKER 0x01
 
 /* REGION IDENTIFIERS */
 #define AS 433E6
