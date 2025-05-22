@@ -66,6 +66,11 @@ struct PacketQueue {
   /** Consumes the internal proto_packet */
   inline void pipe(char* output_buffer)
   {
+    if (sizeof(output_buffer) < sizeof(_proto_uart_packet))
+    {
+      // TODO: Handle buffer overflow
+    }
+
     memcpy((char*)&output_buffer, &_proto_uart_packet, sizeof(_proto_uart_packet));
 
     // clean-up

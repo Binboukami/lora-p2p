@@ -27,19 +27,7 @@ void _setup() {
 char *uart_buff_in[UART_BUFF_SZ];
 char *uart_buff_out[UART_BUFF_SZ];
 
-// 127 bytes
-struct UART_PKT {
-  struct UART_PKT_HEADER {
-    // unsigned int _STX_;          // 1 8bits
-    char _STX_A;
-    char _STX_B;
-    unsigned short _ID_;            // 2 16bits
-    unsigned short _LEN_;           // 2 16bits
-  } _HEAD_;
-  char _DATA_[121];                 // 121 bytes
-  char _C_PAD_;
-  char _ETX_;                       // 1
-};
+PacketQueue packetQueue;
 
 void _loop() {
   if(onInterval(1000))
@@ -72,29 +60,22 @@ void _loop() {
     // LoRa packet -> Process -> UART -> Server Application 
     // Simulate LoRa receive callback
     {
-      // Forward messages stored in a queue
-      // Hint: The actual packet can be reused, the value that change are
-      //       id, content_length, and content
+      unsigned short new_packet_id;
 
-      UART_PKT test_packet = {
-        ._HEAD_ = {
-          // ._STX_ = 0xFFAA,
-          ._STX_A = 0xFF,
-          ._STX_B = 0xAA,
-          ._ID_ = 0x01,
-          ._LEN_ = 121
-        },
-        ._C_PAD_ = 'Z',
-        ._ETX_ = '\n'
-      };
-
-      strcpy(test_packet._DATA_, "Hello, World");
-
-      memcpy((char*)&uart_buff_out, &test_packet, sizeof(test_packet));
+      char* packet_data = "Hello, world";
+      packetQueue.push(0x01, 121, packet_data);
 
       if(UART0.availableForWrite())
       {
-        UART0.write((char*)&uart_buff_out, sizeof(uart_buff_out));
+        if(packetQueue.isWaiting())
+        {
+          packetQueue.mountNext();
+          packetQueue.pipe((char*)&uart_buff_out);
+
+          UART0.write((char*)&uart_buff_out, sizeof(uart_buff_out));
+
+          // memset(uart_buff_out, 0, sizeof(uart_buff_out));
+        }
       }
     }
 
