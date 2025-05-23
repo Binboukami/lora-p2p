@@ -37,18 +37,21 @@ void _loop() {
     {
       // 3-Step operation
       // 1: Read everything into a binary buffer
+      // pipe_into_buffer(...)
       UART0.readBytesUntil('\n', (char*)&uart_buff_in, sizeof(uart_buff_in));
       // 2: Parse header to get hints on how to parse the packet body
-      //    - Read until heaader delimiter (define later) something like \h\h
       // 3: Parse packet body
       //    - Read remaining buffer content up to specified size casted by packet
-      //    parse_packet((packer*)buffer);
+      // parse_packet((packet*)buffer);
     }
 
     // Forward call to remote ESP32 stub
     /*
       switch(command):
-        case ???: call run_cmd_a();
+        case COMMAND_TYPE_A: call run_cmd_a();
+          break;
+        case COMMAND_TYPE_B: call run_cmd_b(command.params[0], command.params[...]);
+          break;
       ...
 
       LoRa.send(call_header, call_payload)
@@ -56,9 +59,9 @@ void _loop() {
 
     // TODO: Process incoming RPC calls through LoRa interface and forward to server application
     // LoRa packet -> Process -> UART -> Server Application 
-    // Simulate LoRa receive callback
     {
-      unsigned short new_packet_id;
+      // build_packet(...); Prebuilt packets based on different rpc calls
+      unsigned short new_pqacket_id;
 
       char* packet_data = "Hello, world";
       packetQueue.push(0x01, 121, packet_data);
