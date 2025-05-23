@@ -26,7 +26,7 @@ struct UART_PACKET_MODIFIABLE_CONTENT {
 struct PacketQueue {
   UART_PACKET _proto_uart_packet;
 
-  size_t _packets_qeueue_max_sz = PACKET_QUEUE_MAX_SZ;
+  size_t _packets_queue_max_sz = PACKET_QUEUE_MAX_SZ;
   std::queue<UART_PACKET_MODIFIABLE_CONTENT> _packets;
 
   /** Returns true if there are packets in the queue */
@@ -36,7 +36,7 @@ struct PacketQueue {
   {
     size_t current_size = _packets.size();
 
-    if(current_size == _packets_qeueue_max_sz)
+    if(current_size == _packets_queue_max_sz)
       return 1;
 
     _packets.push(
