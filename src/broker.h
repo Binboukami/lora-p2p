@@ -7,9 +7,6 @@
   #include "display.h"
 #endif
 
-Packet out_p;
-Packet pacote;
-
 void _setup() {
 
   // #ifdef DEBUG_SERIAL
@@ -94,6 +91,7 @@ void onTxDone() {
 }
 
 void onReceive(int packetSize) {
+  // TODO: Implement LoRa_Packet, used to pass rpc-like calls
   LoRa.readBytes((uint8_t*)&pacote, sizeof(pacote));
 
   #ifdef DEBUG_SERIAL
