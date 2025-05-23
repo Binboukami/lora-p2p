@@ -3,6 +3,7 @@
 #include <LoRa.h>
 #include "config.h"
 #include "common/uart_packet.h"
+#include "common/lora_packet.h"
 
 extern long _lastSendTime;
 

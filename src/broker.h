@@ -24,7 +24,8 @@ void _setup() {
 char *uart_buff_in[UART_BUFF_SZ];
 char *uart_buff_out[UART_BUFF_SZ];
 
-PacketQueue packetQueue;
+LORA_PACKET lora_packet_in;
+PacketQueue packetQueue; // UART
 
 void _loop() {
   if(onInterval(1000))
@@ -91,8 +92,7 @@ void onTxDone() {
 }
 
 void onReceive(int packetSize) {
-  // TODO: Implement LoRa_Packet, used to pass rpc-like calls
-  LoRa.readBytes((uint8_t*)&pacote, sizeof(pacote));
+  LoRa.readBytes((uint8_t*)&lora_packet_in, sizeof(lora_packet_in));
 
   #ifdef DEBUG_SERIAL
     UART0.println("RECEBIDO: ");
