@@ -3,9 +3,9 @@
 /* Wrap around conditional if board is replaced during development */
 #include "hal/ttgov2.h"
 
-#ifndef USE_DISPLAY
-  #undef HAS_DISPLAY
-#endif
+// #ifndef USE_DISPLAY
+//   #undef HAS_DISPLAY
+// #endif
 
 /* OS MODES 
   Uses build flags to keep all the source code in the same project

@@ -25,13 +25,22 @@ char *uart_buff_in[UART_BUFF_SZ];
 char *uart_buff_out[UART_BUFF_SZ];
 
 LORA_PACKET lora_packet_in;
-PacketQueue packetQueue; // UART
+PacketQueue uartPacketQueue; // UART
+
+void onDisplay()
+{
+  display.clear();
+  display.setCursor(0, 0);
+
+  display.clear();
+  display.printf("Waiting...\n");
+  display.printf("R: %s\n", uart_buff_in);
+}
 
 void _loop() {
   if(onInterval(1000))
   {
-    // TODO: Process messages incoming from serial port
-    // TODO: Show messages on display (for debugging)
+    // Parse incoming data from main device (Server application, in this case)
     // Server Application -> UART -> Process -> LoRa packet
     while(UART0.available())
     {
@@ -54,6 +63,8 @@ void _loop() {
           break;
       ...
 
+      // TODO: Mount LoRa packet for transmission
+
       LoRa.send(call_header, call_payload)
     */
 
@@ -61,17 +72,17 @@ void _loop() {
     // LoRa packet -> Process -> UART -> Server Application 
     {
       // build_packet(...); Prebuilt packets based on different rpc calls
-      unsigned short new_pqacket_id;
+      unsigned short new_packet_id = 0x01;
 
       char* packet_data = "Hello, world";
-      packetQueue.push(0x01, 121, packet_data);
+      uartPacketQueue.push(new_packet_id, 121, packet_data);
 
       if(UART0.availableForWrite())
       {
-        if(packetQueue.isWaiting())
+        if(uartPacketQueue.isWaiting())
         {
-          packetQueue.mountNext();
-          packetQueue.pipe((char*)&uart_buff_out);
+          uartPacketQueue.mountNext();
+          uartPacketQueue.pipe((char*)&uart_buff_out);
 
           UART0.write((char*)&uart_buff_out, sizeof(uart_buff_out));
 
@@ -81,9 +92,7 @@ void _loop() {
     }
 
     #ifdef USE_DISPLAY
-      display.clear();
-      display.printf("Waiting...\n");
-      display.printf("R: %s\n", uart_buff_in);
+      onDisplay();
     #endif
   }
 }

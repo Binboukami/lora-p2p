@@ -6,9 +6,6 @@
 
 extern int counter;
 
-Packet in_packet;
-Packet out_packet;
-
 void _setup() {
 
   UART0.begin(9600);
@@ -20,41 +17,63 @@ void _setup() {
   LoRa.onReceive(onReceive);
 }
 
+#define UART_BUFF_SZ 32
+
+char *uart_buff_in[UART_BUFF_SZ];
+char *uart_buff_out[UART_BUFF_SZ];
+
+LORA_PACKET lora_packet_in;
+LORA_PACKET lora_packet_out;
+
+PacketQueue uartPacketQueue; // UART
+
+void onDisplay()
+{
+  display.clear();
+  display.setCursor(0, 0);
+
+  //
+}
 
 void _loop() {
   if(onInterval())
   {
-    memset(out_packet.payload, 0, sizeof(out_packet.payload));
-
     // Parse incoming data from main device (Arduino Mega, in this case)
     while(UART0.available())
     {
-      UART0.readBytes((uint8_t*)&out_packet, sizeof(out_packet));
+      UART0.readBytesUntil('\n', (char*)&uart_buff_in, sizeof(uart_buff_in));
     }
 
+    // TODO: Mount LoRa packet for transmission
+
     // Streaming standard non-blocking packet (meant for device health status)
-    LoRa.beginPacket();
-    LoRa.write(out_packet.op_code);
-    LoRa.printf("%s\0", out_packet.payload);
-    LoRa.endPacket(true);
+    // LoRa.beginPacket();
+    // LoRa.write(out_packet.op_code);
+    // LoRa.printf("%s\0", out_packet.payload);
+    // LoRa.endPacket(true);
 
     // Display
-    #ifdef HAS_DISPLAY
-      display.clear();
-      display.setCursor(0, 0);
-
-      display.println("ENVIANDO: ");
-      display.printf("OP CODE: %u\n", out_packet.op_code);
-      display.printf("PAYLOAD: %s\n", out_packet.payload);
-
-      display.println("RECEBENDO: ");
-      display.printf("OP CODE: %u\n", in_packet.op_code);
+    #ifdef USE_DISPLAY
+      onDisplay();
     #endif
 
+    unsigned short new_packet_id = 0x01;
+
+    char* packet_data = "Hello, world";
+    uartPacketQueue.push(new_packet_id, 121, packet_data);
+
     // Pass incoming data from broker to main device
-    while(UART0.availableForWrite())
+    if(UART0.availableForWrite())
     {
-      UART0.write(in_packet.op_code);
+      if(uartPacketQueue.isWaiting())
+      {
+        uartPacketQueue.mountNext();
+        uartPacketQueue.pipe((char*)&uart_buff_out);
+
+        UART0.write((char*)&uart_buff_out, sizeof(uart_buff_out));
+
+        // memset(uart_buff_out, 0, sizeof(uart_buff_out));
+      }
     }
   }
 }
@@ -62,9 +81,9 @@ void _loop() {
 void onTxDone() {}
 
 void onReceive(int packetSize) {
+  LoRa.readBytes((uint8_t*)&lora_packet_in, sizeof(lora_packet_in));
 
-  memset(&in_packet, 0, sizeof(in_packet));
-  LoRa.readBytes((uint8_t*)&in_packet, sizeof(in_packet));
-
-  // TODO: Valida pacote
+  {
+    // TODO: Valida pacote
+  }
 };
