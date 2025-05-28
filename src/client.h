@@ -1,4 +1,5 @@
 #pragma once
+/** @deprecated */
 
 #include <LoRa.h>
 #include "common/esp_lora.h"

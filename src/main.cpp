@@ -1,10 +1,11 @@
 #include <Wire.h>
 #include "config.h"
+#include "os.h"
 
 #if OS_MODE == CLIENT
   #include "client.h"
 #else
-  #include "broker.h"
+  #include "broker_os.h"
 #endif
 
 #ifdef USE_DISPLAY
@@ -26,6 +27,7 @@
   - TRANSMIT_SCHEDULED_QUERIES
 */
 
+BrokerOS comms_os;
 
 int counter = 0;
 long _lastSendTime = 0;
@@ -34,14 +36,10 @@ void setup() {
 
   while(!initLoRa());
 
-  #ifdef HAS_DISPLAY
-    init_display();
-  #endif
-
-  _setup();
+  comms_os.initialize();
 }
 
 void loop()
 {
-  _loop();
+  comms_os.onLoop();
 }

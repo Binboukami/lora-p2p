@@ -3,6 +3,7 @@
 #define PACKET_PAYLOAD_MAX_SZ 127
 #define PACKET_QUEUE_MAX_SZ 2
 #include <queue>
+#include <cstring>
 
 /** TODO: Debug assert the packet size, should be ~127 bytes */
 struct UART_PACKET {

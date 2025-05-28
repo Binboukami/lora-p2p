@@ -1,3 +1,5 @@
+// @deprecated
+
 #include <U8x8lib.h>
 #include "config.h"
 
